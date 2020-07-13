@@ -105,6 +105,13 @@ pipeline {
                             sed -i "s/\"localhost\"/\"${db_container_name}\"/" tests/test_connection.py
                             sed -i "s/host=\\x27localhost\\x27/host=\\x27${db_container_name}\\x27/" pymapd/connection.py
                             sed -i "s|@localhost:6274|@${db_container_name}:6274|" pymapd/connection.py
+
+                            # Create RBC testing endpoint config file
+                            cat >rbc.conf <<EOF
+                            [server]
+                              host: ${db_container_name}
+                              port: 6274
+                            EOF
                         """
                     }
                 }
@@ -343,6 +350,69 @@ pipeline {
                 //         }
                 //     }
                 // }
+                stage('RBC tests - conda python3.6') {
+                    steps {
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            script { stage_succeeded = false }
+                            setBuildStatus("Running tests", "PENDING", "$STAGE_NAME", git_commit);
+                            sh """
+                                docker run \
+                                  -d \
+                                  --rm \
+                                  --runtime=nvidia \
+                                  --ipc="shareable" \
+                                  --network="pytest" \
+                                  -p 6273 \
+                                  --name $db_container_name \
+                                  $db_container_image \
+                                  bash -c "/omnisci/startomnisci \
+                                    --non-interactive \
+                                    --data /omnisci-storage/data \
+                                    --config /omnisci-storage/omnisci.conf \
+                                    --enable-runtime-udf \
+                                    --enable-table-functions \
+                                  "
+                                sleep 3
+
+                                docker run \
+                                  --rm \
+                                  --runtime=nvidia \
+                                  --ipc="container:${db_container_name}" \
+                                  --network="pytest" \
+                                  -v $WORKSPACE:/pymapd \
+                                  --workdir="/pymapd" \
+                                  --name $testscript_container_name \
+                                  $testscript_container_image \
+                                  bash -c '\
+                                    git clone https://github.com/xnd-project/rbc && \
+                                    pushd rbc && \
+                                    conda env create --file=.conda/environment.yml && \
+                                    conda activate rbc && \
+                                    OMNISCI_CLIENT_CONF=/pymapd/rbc.conf pytest -v -r s rbc/ -x && \
+                                  '
+
+                                docker rm -f $testscript_container_name || true
+                                docker rm -f $db_container_name || true
+                            """
+                            script { stage_succeeded = true }
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                if (stage_succeeded == true) {
+                                    setBuildStatus("Build succeeded", "SUCCESS", "$STAGE_NAME", git_commit);
+                                } else {
+                                    sh """
+                                        docker rm -f $testscript_container_name || true
+                                        docker rm -f $db_container_name || true
+                                    """
+                                    setBuildStatus("Build failed", "FAILURE", "$STAGE_NAME", git_commit);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             post {
                 always {
