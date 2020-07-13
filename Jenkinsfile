@@ -388,7 +388,7 @@ pipeline {
                                     pushd rbc && \
                                     conda env create --file=.conda/environment.yml && \
                                     conda activate rbc && \
-                                    OMNISCI_CLIENT_CONF=/pymapd/rbc.conf pytest -v -r s rbc/ -x && \
+                                    OMNISCI_CLIENT_CONF=/pymapd/rbc.conf pytest -v -r s rbc/ -x \
                                   '
 
                                 docker rm -f $testscript_container_name || true
