@@ -112,6 +112,7 @@ pipeline {
                               host: ${db_container_name}
                               port: 6274
                             EOF
+                            cat rbc.conf
                         """
                     }
                 }
