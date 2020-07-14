@@ -386,7 +386,7 @@ EOF
                                   bash -c '\
                                     git clone https://github.com/xnd-project/rbc && \
                                     pushd rbc && \
-                                    sed -i "/omnisci\\.reset\\(\\)/a \\ \\ \\ \\ if method is \\x27max\\x27:\\n\\ \\ \\ \\ \\ \\ \\ \\ pytest.skip(\\x27skipping max\\x27)" rbc/tests/test_omnisci_array_methods.py && \
+                                    sed -i "/omnisci\\.reset\\(\\)/a \\ \\ \\ \\ if method is \\x27max\\x27:\\n\\ \\ \\ \\ \\ \\ \\ \\ pytest.skip(reason=\\x27skipping max\\x27)" rbc/tests/test_omnisci_array_methods.py && \
                                     cat rbc/tests/test_omnisci_array_methods.py && \
                                     cat /pymapd/rbc.conf && \
                                     conda env create --file=.conda/environment.yml && \
