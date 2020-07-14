@@ -107,7 +107,7 @@ pipeline {
                             sed -i "s|@localhost:6274|@${db_container_name}:6274|" pymapd/connection.py
 
                             # Create RBC testing endpoint config file
-                            cat >rbc.conf <<EOF
+                            cat <<EOF > rbc.conf
                             [server]
                               host: ${db_container_name}
                               port: 6274
