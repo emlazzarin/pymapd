@@ -108,10 +108,10 @@ pipeline {
 
                             # Create RBC testing endpoint config file
                             cat <<EOF > rbc.conf
-                            [server]
-                              host: ${db_container_name}
-                              port: 6274
-                            EOF
+[server]
+  host: ${db_container_name}
+  port: 6274
+EOF
                         """
                     }
                 }
