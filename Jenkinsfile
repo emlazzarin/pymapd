@@ -362,7 +362,7 @@ EOF
                                   --runtime=nvidia \
                                   --ipc="shareable" \
                                   --network="pytest" \
-                                  -p 6273 \
+                                  -p 6274 \
                                   --name $db_container_name \
                                   $db_container_image \
                                   bash -c "/omnisci/startomnisci \
@@ -380,7 +380,7 @@ EOF
                                   --ipc="container:${db_container_name}" \
                                   --network="pytest" \
                                   -v $WORKSPACE:/pymapd \
-                                  --workdir="/pymapd" \
+                                  --workdir="/workdir" \
                                   --name $testscript_container_name \
                                   $testscript_container_image \
                                   bash -c '\
