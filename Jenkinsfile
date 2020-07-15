@@ -372,7 +372,9 @@ EOF
                                     --enable-runtime-udf \
                                     --enable-table-functions \
                                   "
-                                sleep 3
+                                sleep 60
+
+                                docker ps -a
 
                                 docker run \
                                   --rm \
@@ -384,6 +386,9 @@ EOF
                                   --name $testscript_container_name \
                                   $testscript_container_image \
                                   bash -c '\
+                                    apt update && \
+                                    apt install netcat -y && \
+                                    nc -vz ${db_container_name} 6274 && \
                                     git clone https://github.com/xnd-project/rbc && \
                                     pushd rbc && \
                                     git checkout 'fix-pytest-rc1' && \
