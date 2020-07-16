@@ -170,6 +170,22 @@ EOF
                             script { stage_succeeded = true }
                         }
                     }
+                    post {
+                        always {
+                            script {
+                                if (stage_succeeded == true) {
+                                    setBuildStatus("Build succeeded", "SUCCESS", "$STAGE_NAME", git_commit);
+                                } else {
+                                    sh """
+                                        docker rm -f $testscript_container_name || true
+                                        docker rm -f $db_container_name || true
+                                    """
+                                    setBuildStatus("Build failed", "FAILURE", "$STAGE_NAME", git_commit);
+                                }
+                            }
+                        }
+                    }
+                }
                 stage('Pytest - conda python3.6') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
@@ -405,21 +421,6 @@ EOF
                 //         }
                 //     }
                 // }
-                    post {
-                        always {
-                            script {
-                                if (stage_succeeded == true) {
-                                    setBuildStatus("Build succeeded", "SUCCESS", "$STAGE_NAME", git_commit);
-                                } else {
-                                    sh """
-                                        docker rm -f $testscript_container_name || true
-                                        docker rm -f $db_container_name || true
-                                    """
-                                    setBuildStatus("Build failed", "FAILURE", "$STAGE_NAME", git_commit);
-                                }
-                            }
-                        }
-                    }
                 }
             }
             post {
