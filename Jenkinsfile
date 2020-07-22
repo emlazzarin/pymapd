@@ -131,6 +131,7 @@ EOF
                                   --name $db_container_name \
                                   $db_container_image \
                                   bash -c "/omnisci/startomnisci \
+                                    --cpu-only \
                                     --non-interactive \
                                     --data /omnisci-storage/data \
                                     --config /omnisci-storage/omnisci.conf \
