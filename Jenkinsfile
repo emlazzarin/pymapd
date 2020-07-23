@@ -123,7 +123,6 @@ EOF
                             sh """
                                 docker run \
                                   -d \
-                                  --rm \
                                   --runtime=nvidia \
                                   --ipc="shareable" \
                                   --network="pytest" \
@@ -141,6 +140,7 @@ EOF
                                 sleep 60
 
                                 docker ps -a
+                                docker logs $db_container_name
 
                                 docker run \
                                   --rm \
