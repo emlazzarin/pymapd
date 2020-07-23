@@ -129,11 +129,7 @@ EOF
                                   -p 6274 \
                                   --name $db_container_name \
                                   $db_container_image \
-                                  bash -c "/omnisci/startomnisci \
-                                    --cpu-only \
-                                    --enable-runtime-udf \
-                                    --enable-table-functions \
-                                  "
+                                  bash -c "/omnisci/startomnisci --cpu-only"
                                 sleep 60
 
                                 docker ps -a
